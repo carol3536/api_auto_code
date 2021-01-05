@@ -7,7 +7,7 @@
             <class name="com.lemon.testcase.testLogin02"></class>
             <class name="com.lemon.testcase.GetUserInfoTestv2"></class>
             <class name="com.lemon.testcase.RechargeTest"></class>
-            <class name="com.lemon.testcase.AddLoanTest"/>
+            
         </classes>
     </test>
 </suite>
