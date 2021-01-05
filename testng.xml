@@ -3,11 +3,11 @@
 <suite name="前程贷接口测试">
     <test name="test">
         <classes>
-            <class name="com.lemon.testcase.Register"/>
-            <class name="com.lemon.testcase.testLogin02"></class>
-            <class name="com.lemon.testcase.GetUserInfoTestv2"></class>
-            <class name="com.lemon.testcase.RechargeTest"></class>
-            
+            <class name="com.lemon.testcases.register"/>
+            <class name="com.lemon.testcases.testLogin02"></class>
+            <class name="com.lemon.testcases.GetUserInfoTestv2"></class>
+            <class name="com.lemon.testcases.Recharge"></class>
+            <class name="com.lemon.testcases.AddLoan"/>
         </classes>
     </test>
 </suite>

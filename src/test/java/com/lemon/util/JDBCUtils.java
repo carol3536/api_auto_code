@@ -1,4 +1,4 @@
-package com.lemon.utils;
+package com.lemon.util;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapHandler;
@@ -59,7 +59,7 @@ public class JDBCUtils {
             System.out.println(map);
         }
 //        5.查询返回一条数据
-        String sqlStr4 = "select * from member where mobile_phone = 18851983607";
+        String sqlStr4 = "select * from member where mobile_phone = 18851983607;";
         Map<String, Object> map = queryOne(sqlStr4);
         System.out.println(map);
         //        6.查询返回一个结果，一个数据，一个字符串。。。。

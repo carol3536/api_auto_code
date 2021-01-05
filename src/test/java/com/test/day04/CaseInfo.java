@@ -1,4 +1,4 @@
-package com.lemon.pojo;
+package com.test.day04;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 
@@ -22,15 +22,13 @@ public class CaseInfo {
     @Excel(name = "请求头(requestHeader)")
     private String requestHeader;
     @Excel(name = "请求方式(method)")
-    private String method;
+    private  String method;
     @Excel(name = "接口地址(url)")
     private String url;
     @Excel(name = "参数输入(inputParams)")
     private String inputParams;
     @Excel(name = "期望返回结果")
     private String expected;
-    @Excel(name = "数据库校验")
-    private String checkSql;
 
     public int getCaseId() {
         return caseId;
@@ -96,14 +94,6 @@ public class CaseInfo {
         this.expected = expected;
     }
 
-    public String getCheckSql() {
-        return checkSql;
-    }
-
-    public void setCheckSql(String checkSql) {
-        this.checkSql = checkSql;
-    }
-
     @Override
     public String toString() {
         return "CaseInfo{" +
@@ -115,7 +105,6 @@ public class CaseInfo {
                 ", url='" + url + '\'' +
                 ", inputParams='" + inputParams + '\'' +
                 ", expected='" + expected + '\'' +
-                ", checkSql='" + checkSql + '\'' +
                 '}';
     }
 }

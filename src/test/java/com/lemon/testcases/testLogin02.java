@@ -1,12 +1,12 @@
-package com.lemon.testcase;
+package com.lemon.testcases;
 
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lemon.Datas.GlobalEnvironment;
-import com.lemon.baseCase.BaseCase;
+import com.lemon.base.BaseCase;
+import com.lemon.data.GlobalEnvironment;
 import com.lemon.pojo.CaseInfo;
 import io.qameta.allure.Allure;
 import io.restassured.response.Response;
@@ -35,8 +35,8 @@ import static io.restassured.RestAssured.given;
  * @Desc：
  **/
 
-public class testLogin02 extends BaseCase {
-   public static List<CaseInfo> caseInfoList;
+public class testLogin02 extends BaseCase{
+    List<CaseInfo> caseInfoList;
     @BeforeClass
     public void setup(){
         caseInfoList = getCaseDataFromExcel(1);
@@ -48,7 +48,7 @@ public class testLogin02 extends BaseCase {
 //        字符串请求行转换为Map
 //        实现思路：把原有的字符串转换为json数据类型保存，通过ObjectMapper来转换为Map
 //        Jackson json字符串--》map
-//        1.实例化ObjectMapper对象
+////        1.实例化ObjectMapper对象
 //        ObjectMapper objectMapper = new ObjectMapper();
 ////        readValue方法参数解释
 ////        第一个参数：json字符串  第二个参数：转成的类型（map）
@@ -56,20 +56,28 @@ public class testLogin02 extends BaseCase {
         Map headerMap = fromJsonToMap(caseInfo.getRequestHeader());
         System.out.println(headerMap);
         System.out.println(caseInfo.getInputParams());
-        String logDir = addLogDir(caseInfo.getInterfaceName(), caseInfo.getCaseId());
-        Response res = given().log().all().
+        String logToFile = addLogToFile(caseInfo.getInterfaceName(), caseInfo.getCaseId());
+        Response res = given().
                 headers(headerMap).
                 body(caseInfo.getInputParams()).
 
-                when().
-                post( caseInfo.getUrl()).
-                then().log().body().
+        when().
+                post(caseInfo.getUrl()).
+        then().log().body().
 
                 extract().response();
-
-        InputStream inputStream = new FileInputStream(logDir);
-        Allure.addAttachment("接口请求响应信息",inputStream);
-        //        ---------------------封装了断言部分
+        InputStream inputStream = new FileInputStream(logToFile);
+        Allure.addAttachment("请求接口响应信息",inputStream);
+//        String expected = caseInfo.getExpected();
+//        ObjectMapper mapper2 = new ObjectMapper();
+//        Map expectedMap = mapper2.readValue(expected, Map.class);
+//        Set<Map.Entry<String,Object>> set = expectedMap.entrySet();
+//        for (Map.Entry<String, Object> map : set) {
+////           关键点：做断言。通过Gpath获取实际接口响应对应字段的值
+////            我们在Excel里面写用例的期望结果时，期望结果里面键名--->Gpath表达式
+////            期望结果里面键值--->期望值
+//            Assert.assertEquals(res.path(map.getKey()),map.getValue());
+//        }
         assertExpected(caseInfo,res);
 
 
@@ -79,21 +87,15 @@ public class testLogin02 extends BaseCase {
         if(memberId != null){
             //        2.保存到环境变量中
 //            GlobalEnvironment.memberId = memberId;
-//            System.out.println("11111111111111");
-//            System.out.println(GlobalEnvironment.memberId);
-
-
             if (caseInfo.getCaseId() == 1){
-                GlobalEnvironment.env.put("token1",res.path("data.token_info.token"));
-
+                GlobalEnvironment.envDatas.put("token1",res.path("data.token_info.token"));
             }else if (caseInfo.getCaseId() == 2){
-                GlobalEnvironment.env.put("token2",res.path("data.token_info.token"));
+                GlobalEnvironment.envDatas.put("token2",res.path("data.token_info.token"));
             }else if (caseInfo.getCaseId() == 3){
-                GlobalEnvironment.env.put("token3",res.path("data.token_info.token"));
+                GlobalEnvironment.envDatas.put("token3",res.path("data.token_info.token"));
             }
 
         }
-
     }
 
     @DataProvider

@@ -1,13 +1,14 @@
-package com.test.day03;
+package com.test.day04;
 
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lemon.pojo.CaseInfo;
 import io.restassured.response.Response;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -30,7 +31,7 @@ import static io.restassured.RestAssured.given;
 
 public class testLogin02 {
     List<CaseInfo> caseInfoList;
-    @BeforeTest
+    @BeforeClass
     public void setup(){
         caseInfoList = getCaseDataFromExcel(1);
     }
@@ -72,7 +73,11 @@ public class testLogin02 {
         Integer memberId =  res.path("data.id");
         if(memberId != null){
             //        2.保存到环境变量中
-            GlobalEnvironment.memberId = memberId;
+//            GlobalEnvironment.memberId = memberId;
+            GlobalEnvironment.envDatas.put("memberId",memberId);
+            String token = res.path("data.token_info.token");
+            GlobalEnvironment.envDatas.put("token",token);
+
         }
 
     }

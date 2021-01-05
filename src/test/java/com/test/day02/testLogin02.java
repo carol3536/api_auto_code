@@ -5,12 +5,16 @@ import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.response.Response;
+import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 
@@ -25,28 +29,52 @@ import static io.restassured.RestAssured.given;
  **/
 
 public class testLogin02 {
-    @Test(dataProvider = "getLoginDatas02")
-    public void testLogin(CaseInfo caseInfo) throws JsonProcessingException {
-//        
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map map = objectMapper.readValue(caseInfo.getRequestHeader(), Map.class);
-        System.out.println(map);
-
-//        given().
-//                header("Content-Type",header1).
-//                header("X-Lemonban-Media-Type",header2).
-//                body(caseInfo.getInputParams()).
-//
-//                when().
-//                        post(caseInfo.getUrl()).
-//                then().
-//
-//                log().body();
+    List<CaseInfo> caseInfoList;
+    @BeforeTest
+    public void setup(){
+        caseInfoList = getCaseDataFromExcel(1);
     }
-    @DataProvider
-    public Object[] getLoginDatas02(){
-//        dataprovider数据提供者返回值类型可以是Object[]也可以是Object[][]
+    @Test(dataProvider = "getLoginDatas")
+    public void testLogin(CaseInfo caseInfo) throws JsonProcessingException {
+//        String jsonStr = "{\"mobile_phone\": \"15515341409\", \"pwd\": \"lemon66622\"}";
+//        字符串请求行转换为Map
+//        实现思路：把原有的字符串转换为json数据类型保存，通过ObjectMapper来转换为Map
+//        Jackson json字符串--》map
+//        1.实例化ObjectMapper对象
+        ObjectMapper objectMapper = new ObjectMapper();
+//        readValue方法参数解释
+//        第一个参数：json字符串  第二个参数：转成的类型（map）
+        Map headerMap = objectMapper.readValue(caseInfo.getRequestHeader(), Map.class);
+        System.out.println(headerMap);
 
+        Response res = given().
+                headers(headerMap).
+                body(caseInfo.getInputParams()).
+
+                when().
+                post("http://api.lemonban.com/futureloan" + caseInfo.getUrl()).
+                then().log().body().
+
+                extract().response();
+        String expected = caseInfo.getExpected();
+        ObjectMapper mapper2 = new ObjectMapper();
+        Map expectedMap = mapper2.readValue(expected, Map.class);
+        Set<Map.Entry<String,Object>> set = expectedMap.entrySet();
+        for (Map.Entry<String, Object> map : set) {
+//           关键点：做断言。通过Gpath获取实际接口响应对应字段的值
+//            我们在Excel里面写用例的期望结果时，期望结果里面键名--->Gpath表达式
+//            期望结果里面键值--->期望值
+            Assert.assertEquals(res.path(map.getKey()),map.getValue());
+        }
+
+    }
+
+    @DataProvider
+    public Object[] getLoginDatas(){
+
+        return caseInfoList.toArray();
+    }
+    public List<CaseInfo> getCaseDataFromExcel(int index) {
         ImportParams importParams = new ImportParams();
 //        sheet索引，默认起始值为0
         importParams.setStartSheetIndex(1);
@@ -54,11 +82,6 @@ public class testLogin02 {
 //        importParams.setSheetNum(2);
         File excelFile = new File("src/test/resources/testcasehome1.xls");
         List<CaseInfo> list = ExcelImportUtil.importExcel(excelFile, CaseInfo.class, importParams);
-        Object[] datas = list.toArray();
-//        for (CaseInfo caseInfo : list) {
-//            System.out.println(caseInfo);
-//        }
-        return datas;
+        return list;
     }
-
 }
